@@ -54,24 +54,27 @@ namespace SmartVault.DataGeneration
             int documentNumber = 0;
             string documentPath = new FileInfo("TestDoc.txt").FullName;
             long documentLength = new FileInfo(documentPath).Length;
-
+            DateTime now = DateTime.Now;
             for (int i = 0; i < 100; i++)
             {
                 var randomDayIterator = RandomDay().GetEnumerator();
                 randomDayIterator.MoveNext();
 
-                userValues.Append($"('{i}','FName{i}','LName{i}','{randomDayIterator.Current:yyyy-MM-dd}','{i}','UserName-{i}','e10adc3949ba59abbe56e057f20f883e'),");
-                accountValues.Append($"('{i}','Account{i}'),");
+                userValues.Append($"('{i}','FName{i}','LName{i}','{randomDayIterator.Current:yyyy-MM-dd}','{i}','UserName-{i}','e10adc3949ba59abbe56e057f20f883e', '{now}'" +
+                    $"),");
+                accountValues.Append($"('{i}','Account{i}', '{now:yyyy-MM-dd}'" +
+                    $"),");
 
                 for (int d = 0; d < 10000; d++, documentNumber++)
                 {
-                    documentValues.Append($"('{documentNumber}','Document{i}-{d}.txt','{documentPath}','{documentLength}','{i}'),");
+                    documentValues.Append($"('{documentNumber}','Document{i}-{d}.txt','{documentPath}','{documentLength}','{i}', '{now}'" +
+                        $"),");
                 }
             }
 
-            connection.Execute("INSERT INTO User (Id, FirstName, LastName, DateOfBirth, AccountId, Username, Password) VALUES" + userValues.ToString().TrimEnd(','));
-            connection.Execute("INSERT INTO Account (Id, Name) VALUES" + accountValues.ToString().TrimEnd(','));
-            connection.Execute("INSERT INTO Document (Id, Name, FilePath, Length, AccountId) VALUES" + documentValues.ToString().TrimEnd(','));
+            connection.Execute("INSERT INTO User (Id, FirstName, LastName, DateOfBirth, AccountId, Username, Password, CreatedOn) VALUES" + userValues.ToString().TrimEnd(','));
+            connection.Execute("INSERT INTO Account (Id, Name, CreatedOn) VALUES" + accountValues.ToString().TrimEnd(','));
+            connection.Execute("INSERT INTO Document (Id, Name, FilePath, Length, AccountId, CreatedOn) VALUES" + documentValues.ToString().TrimEnd(','));
         }
 
         private static void CreateBusinessObjectsTables(SQLiteConnection connection)
