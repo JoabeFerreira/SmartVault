@@ -17,11 +17,11 @@ namespace SmartVault.Program
                 return;
             }
 
-            using (SQLiteConnection connection = new ConfigurationHelper().InitializeConfig().CreateConnection())
+            using (SQLiteConnection connection = new SQLiteConfigurationManager().InitializeConfig().CreateConnection())
             {
                 connection.Open();
 
-                WriteEveryThirdFileToFile(args[0], connection);
+                WriteEveryThirdFileToFile(args[0], connection, @"..\..\..\Output");
 
                 _ = GetAllFileSizes(connection);
             }
@@ -46,17 +46,15 @@ namespace SmartVault.Program
             return totalFileSizes;
         }
 
-        public static void WriteEveryThirdFileToFile(string accountId, SQLiteConnection connection)
+        public static void WriteEveryThirdFileToFile(string accountId, SQLiteConnection connection, string outputDirectory)
         {
             List<string> accountDocuments = connection.Query<string>(
                 $"select FilePath from {nameof(Document)} where AccountId = {accountId}"
             ).ToList();
 
-            const string OUTPUT_DIRECTORY = @"..\..\..\Output";
+            Directory.CreateDirectory(outputDirectory);
 
-            Directory.CreateDirectory(OUTPUT_DIRECTORY);
-
-            string thirdFilesFile = Path.Combine(OUTPUT_DIRECTORY, $"Account_{accountId}_ThirdSmithProperties.txt");
+            string thirdFilesFile = Path.Combine(outputDirectory, $"Account_{accountId}_ThirdSmithProperties.txt");
 
             File.WriteAllText(thirdFilesFile, string.Empty);
 

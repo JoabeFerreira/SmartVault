@@ -15,7 +15,7 @@ namespace SmartVault.DataGeneration
     {
         static void Main(string[] args)
         {
-            var config = new ConfigurationHelper();
+            var config = new SQLiteConfigurationManager();
 
             config.InitializeConfig();
 

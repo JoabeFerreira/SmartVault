@@ -5,12 +5,12 @@ using System.IO;
 
 namespace SmartVault.DataGeneration
 {
-    public class ConfigurationHelper
+    public class SQLiteConfigurationManager
     {
         private IConfigurationRoot? _config;
         private string _databaseName = string.Empty;
 
-        public ConfigurationHelper InitializeConfig()
+        public SQLiteConfigurationManager InitializeConfig()
         {
             _config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -20,7 +20,7 @@ namespace SmartVault.DataGeneration
             return this;
         }
 
-        public ConfigurationHelper CreateDatabaseFile()
+        public SQLiteConfigurationManager CreateDatabaseFile()
         {
             SQLiteConnection.CreateFile(_databaseName);
             return this;
