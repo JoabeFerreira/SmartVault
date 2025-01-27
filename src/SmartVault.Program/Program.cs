@@ -24,19 +24,33 @@ namespace SmartVault.Program
 
                 WriteEveryThirdFileToFile("0", connection);
 
-                GetAllFileSizes(connection);
+                _ = GetAllFileSizes(connection);
             }
         }
 
-        private static void GetAllFileSizes(SQLiteConnection connection)
+        private static long GetAllFileSizes(SQLiteConnection connection)
         {
-            // TODO: Implement functionality
+            IEnumerable<string> documents = connection.Query<string>(
+                $"select FilePath from {nameof(Document)}"
+            );
+
+            long totalFileSizes = 0;
+
+            foreach (string doc in documents)
+            {
+                if (File.Exists(doc))
+                {
+                    totalFileSizes += new FileInfo(doc).Length;
+                }
+            }
+
+            return totalFileSizes;
         }
 
         private static void WriteEveryThirdFileToFile(string accountId, SQLiteConnection connection)
         {
-            List<Document> accountDocuments = connection.Query<Document>(
-                $"select * from {nameof(Document)} where AccountId = {accountId}"
+            List<string> accountDocuments = connection.Query<string>(
+                $"select FilePath from {nameof(Document)} where AccountId = {accountId}"
             ).ToList();
 
             const string OUTPUT_DIRECTORY = @"..\..\..\Output";
@@ -50,9 +64,9 @@ namespace SmartVault.Program
             for (int i = 2; i < accountDocuments.Count; i += 3)
             {
                 var doc = accountDocuments[i];
-                if (File.Exists(doc.FilePath))
+                if (File.Exists(doc))
                 {
-                    string fileContent = File.ReadAllText(doc.FilePath);
+                    string fileContent = File.ReadAllText(doc);
                     if (fileContent.Contains("Smith Property"))
                     {
                         File.AppendAllText(thirdFilesFile, fileContent);
