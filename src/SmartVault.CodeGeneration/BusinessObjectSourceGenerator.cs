@@ -14,13 +14,13 @@ namespace SmartVault.CodeGeneration
             // Find the main method
             var mainMethod = context.Compilation.GetEntryPoint(context.CancellationToken);
 
+            var serializer = new XmlSerializer(typeof(BusinessObject));
+
             // Build up the source code
-            for (int i = 0; i < 3; i++)
+            foreach (AdditionalText file in context.AdditionalFiles)
             {
-                var file = context.AdditionalFiles[i];
                 var fileContents = file.GetText().ToString();
 
-                var serializer = new XmlSerializer(typeof(BusinessObject));
                 using var reader = new StringReader(fileContents);
                 var name = Path.GetFileNameWithoutExtension(file.Path);
                 var businessObjectModel = (BusinessObject)serializer.Deserialize(reader);
@@ -42,8 +42,6 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}.BusinessObjects
 }}
 ";
                 context.AddSource($"{name}.generated.cs", businessObjectClassString);
-
-
             }
         }
 
