@@ -8,27 +8,26 @@ using System.Linq;
 
 namespace SmartVault.Program
 {
-    partial class Program
+    public partial class Program
     {
-
         static void Main(string[] args)
         {
-            //if (args.Length == 0)
-            //{
-            //    return;
-            //}
+            if (args.Length == 0)
+            {
+                return;
+            }
 
             using (SQLiteConnection connection = new ConfigurationHelper().InitializeConfig().CreateConnection())
             {
                 connection.Open();
 
-                WriteEveryThirdFileToFile("0", connection);
+                WriteEveryThirdFileToFile(args[0], connection);
 
                 _ = GetAllFileSizes(connection);
             }
         }
 
-        private static long GetAllFileSizes(SQLiteConnection connection)
+        public static long GetAllFileSizes(SQLiteConnection connection)
         {
             IEnumerable<string> documents = connection.Query<string>(
                 $"select FilePath from {nameof(Document)}"
@@ -47,7 +46,7 @@ namespace SmartVault.Program
             return totalFileSizes;
         }
 
-        private static void WriteEveryThirdFileToFile(string accountId, SQLiteConnection connection)
+        public static void WriteEveryThirdFileToFile(string accountId, SQLiteConnection connection)
         {
             List<string> accountDocuments = connection.Query<string>(
                 $"select FilePath from {nameof(Document)} where AccountId = {accountId}"
